@@ -15,6 +15,8 @@
 
 #include <cctype>
 #include <limits>
+#include <string>
+#include <fstream>
 
 #include <AVSCommon/SDKInterfaces/SpeakerInterface.h>
 #include <AVSCommon/Utils/Logger/Logger.h>
@@ -257,9 +259,27 @@ bool UserInputManager::sendDtmf(const std::string& dtmfTones) {
 }
 #endif
 
+std::string prevAlexaInputId = "-1";
+
 SampleAppReturnCode UserInputManager::run() {
     bool userTriggeredLogout = false;
     m_interactionManager->begin();
+
+    while (true) {
+        std::ifstream f("./alexaInput.txt");
+
+        if (f.good()) {
+            std::string currentAlexaInputId = "-1";
+
+            if (std::getline(f, currentAlexaInputId) && currentAlexaInputId != "-1" && prevAlexaInputId != currentAlexaInputId) {
+                if (prevAlexaInputId != "-1") {
+                    m_interactionManager->tap();
+                } 
+                prevAlexaInputId = currentAlexaInputId;               
+            }
+        }
+    }
+
     while (true) {
         char x;
         if (!readConsoleInput(&x)) {
