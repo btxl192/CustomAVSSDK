@@ -18,6 +18,10 @@
 #include <cstring>
 #include <unordered_map>
 
+#include <iostream>
+#include <fstream>
+using namespace std;
+
 #include <gst/controller/gstinterpolationcontrolsource.h>
 #include <gst/controller/gstdirectcontrolbinding.h>
 
@@ -52,7 +56,7 @@ static const std::string TAG("MediaPlayer");
 
 static const std::string MEDIAPLAYER_CONFIGURATION_ROOT_KEY = "gstreamerMediaPlayer";
 /// The key in our config file to set the audioSink.
-static const std::string MEDIAPLAYER_AUDIO_SINK_KEY = "audioSink";
+static const std::string MEDIAPLAYER_AUDIO_SINK_KEY = "fakesink";
 /// The key in our config file to find the output conversion type.
 static const std::string MEDIAPLAYER_OUTPUT_CONVERSION_ROOT_KEY = "outputConversion";
 /// The acceptable conversion keys to find in the config file
@@ -1259,6 +1263,30 @@ void MediaPlayer::handleSetAttachmentReaderSource(
     ACSDK_DEBUG(LX("handleSetAttachmentReaderSourceCalled").d("name", RequiresShutdown::name()));
 
     tearDownTransientPipelineElements(true);
+
+    static size_t count = 1;
+    using namespace std;
+    stringstream fname;
+    fname << "./audioOutput/result-" << count << ".mp3";   
+    std::ofstream out(fname.str(), std::ios::binary);
+    if (out.is_open()) {
+        char buf[1024];
+        avsCommon::avs::attachment::AttachmentReader::ReadStatus status;
+        while (true) {
+            auto len = reader->read(buf, sizeof(buf), &status);
+            if (status == avsCommon::avs::attachment::AttachmentReader::ReadStatus::OK) {
+                out.write(buf, len);
+            } else if (status == avsCommon::avs::attachment::AttachmentReader::ReadStatus::CLOSED) {
+                break;
+            }
+        }
+        reader->close();
+    }
+    out.close();
+    std::ofstream out2("./audioOutput/latestResult.txt");
+    out2 << count;
+    out2.close();
+    count ++;
 
     std::shared_ptr<SourceInterface> source = AttachmentReaderSource::create(this, reader, audioFormat, repeat);
 
