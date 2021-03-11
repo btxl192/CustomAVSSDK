@@ -23,6 +23,10 @@
 #include <Captions/CaptionManager.h>
 #include <Captions/CaptionTimingAdapter.h>
 #include <Captions/TimingAdapterFactory.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
 
 namespace alexaClientSDK {
 namespace captions {
@@ -94,6 +98,23 @@ void CaptionManager::onCaption(CaptionFrame::MediaPlayerSourceId sourceId, const
     // - order doesn't matter as far as which media source's captions gets parsed first
     ACSDK_DEBUG5(LX("sendingCaptionDataToParser").d("sourceId", sourceId));
     m_parser->parse(sourceId, captionData);
+
+    static size_t count = 1;
+    std::stringstream fname;
+    fname << "./textOutput/caption-" << count << ".txt"; 
+    std::ofstream out(fname.str(), std::ofstream::out | std::ofstream::app);
+
+    std::string line;
+    std::istringstream f(captionData.content);
+    int index = 0;
+    while (std::getline(f, line)) {
+        if (index > 0 && index % 4 == 0) {
+            out << line;
+        }  
+        index++;
+    }
+    out.close();
+    count++;
 }
 
 void CaptionManager::setCaptionPresenter(const std::shared_ptr<CaptionPresenterInterface>& presenter) {
