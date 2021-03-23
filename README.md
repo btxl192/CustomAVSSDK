@@ -1,3 +1,14 @@
+## Quick links to parts where we made changes
+
+* [MediaPlayer](https://github.com/btxl192/CustomAVSSDK/blob/master/MediaPlayer/GStreamerMediaPlayer/src/MediaPlayer.cpp#L1271): changed to output mp3 files instead of playing it.
+* [UserInputManager](https://github.com/btxl192/CustomAVSSDK/blob/master/SampleApp/src/UserInputManager.cpp#L262): changed to take input from a temproary file instead of stdin
+* [CaptionManager](https://github.com/btxl192/CustomAVSSDK/blob/master/Captions/Implementation/src/CaptionManager.cpp#L102): changed to output Alexa response to a temproary file.
+
+A python script is used to monitor these temproary files and talk with the unity client.
+
+----
+
+Below is the original README for the Alexa SDK
 ### What is the Alexa Voice Service (AVS)?
 
 The Alexa Voice Service (AVS) enables developers to integrate Alexa directly into their products, bringing the convenience of voice control to any connected device. AVS provides developers with access to a suite of resources to build Alexa-enabled products, including APIs, hardware development kits, software development kits, and documentation.
@@ -39,4 +50,3 @@ View the [C++ API References](https://alexa.github.io/avs-device-sdk/) for detai
 All Alexa products should adopt the [Security Best Practices for Alexa](https://developer.amazon.com/docs/alexa/alexa-voice-service/security-best-practices.html).
 
 When building Alexa with the SDK, you should also adhere to the [following security principles](https://developer.amazon.com/docs/alexa/avs-device-sdk/overview.html#security-best-practices).
-
